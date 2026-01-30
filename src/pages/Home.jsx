@@ -1,16 +1,6 @@
-
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { ShoppingBag, User, LogIn, LogOut, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import NavHeader from "@/components/NavHeader"
+import ProductCard from "@/components/ProductCard"
 
 const products = [
     {
@@ -143,82 +133,76 @@ const products = [
     },
 ]
 
-export default function Home() {
-    const [user, setUser] = useState(() => {
-        const storedUser = localStorage.getItem("currentUser")
-        return storedUser ? JSON.parse(storedUser) : null
-    })
-    const navigate = useNavigate()
+// Hero Carousel Images
+const heroSlides = [
+    "/assets/hero_slides/slide1.png",
+    "/assets/hero_slides/slide2.png",
+    "/assets/hero_slides/slide3.png",
+]
 
-    const handleLogout = () => {
-        localStorage.removeItem("currentUser")
-        setUser(null)
-        alert("Logged out successfully!")
-    }
+export default function Home() {
+    // Carousel State
+    const [currentSlide, setCurrentSlide] = useState(0)
+
+    // Auto-advance slides
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+        }, 3000)
+        return () => clearInterval(timer)
+    }, [])
 
     return (
         <div className="min-h-screen bg-[#fdf2f8]"> {/* Very light pink background */}
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-                <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        {/* Logo Icon */}
-                        <div className="h-10 w-10 bg-gradient-to-tr from-rose-400 to-pink-600 rounded-full flex items-center justify-center text-white shadow-md">
-                            <ShoppingBag size={20} />
-                        </div>
-                        <span className="text-2xl font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r from-rose-700 to-pink-600">
-                            Luxe Collection
-                        </span>
-                    </div>
-                    <nav className="flex items-center gap-4">
-                        {user ? (
-                            <>
-                                <span className="text-rose-900 font-medium font-serif">
-                                    Welcome, {user.name}
-                                </span>
-                                <Button
-                                    onClick={handleLogout}
-                                    variant="ghost"
-                                    className="text-rose-900 hover:text-rose-700 hover:bg-rose-50 font-medium"
-                                >
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    Logout
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Link to="/login">
-                                    <Button variant="ghost" className="text-rose-900 hover:text-rose-700 hover:bg-rose-50 font-medium">
-                                        <LogIn className="mr-2 h-4 w-4" />
-                                        Login
-                                    </Button>
-                                </Link>
-                                <Link to="/register">
-                                    <Button className="bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-90 text-white rounded-full px-6 shadow-md transition-all hover:shadow-lg">
-                                        <User className="mr-2 h-4 w-4" />
-                                        Register
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-                    </nav>
-                </div>
-            </header>
+            <NavHeader />
 
-            {/* Hero Section (Optional visual separator) */}
-            <section className="w-full py-12 md:py-20 bg-gradient-to-b from-white to-[#fdf2f8]">
-                <div className="container mx-auto px-6 text-center">
-                    <h1 className="text-4xl md:text-6xl font-serif font-medium text-rose-950 mb-4">
-                        Curated Aesthetics for You
-                    </h1>
-                    <p className="text-lg text-rose-800/60 max-w-2xl mx-auto">
-                        Explore our handpicked collection of beauty, fashion, and lifestyle essentials.
-                    </p>
+            {/* Hero Section (Carousel) */}
+            <section className="relative h-[500px] w-full overflow-hidden">
+                {/* Slides */}
+                {heroSlides.map((slide, index) => (
+                    <div
+                        key={index}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"
+                            }`}
+                    >
+                        <img
+                            src={slide}
+                            alt={`Hero Slide ${index + 1}`}
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                ))}
+
+                {/* Overlay Content */}
+                <div className="absolute inset-0 bg-black/10 flex items-center justify-center text-center z-10">
+                    <div className="space-y-4 px-4 animate-in fade-in zoom-in duration-1000">
+                        <h1 className="text-4xl md:text-6xl font-serif font-bold text-white drop-shadow-md">
+                            Beauty & Elegance
+                        </h1>
+                        <p className="text-lg md:text-xl text-rose-50 font-medium drop-shadow-sm">
+                            Discover the Luxe Collection for your unique style
+                        </p>
+                    </div>
+                </div>
+
+                {/* Indicators (Dots) */}
+                <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
+                    {heroSlides.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentSlide(index)}
+                            className={`h-2 w-2 rounded-full transition-all ${index === currentSlide
+                                ? "bg-white w-6"
+                                : "bg-white/50 hover:bg-white/80"
+                                }`}
+                        />
+                    ))}
                 </div>
             </section>
 
-            {/* Main Content */}
-            <main className="container mx-auto px-6 pb-20">
+            {/* Products Grid */}
+            <main className="container mx-auto px-6 py-16">
                 <div className="flex flex-col gap-8">
                     <div className="flex items-end justify-between border-b border-rose-100 pb-4">
                         <div>
@@ -228,32 +212,7 @@ export default function Home() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.map((product) => (
-                            <Card key={product.id} className="group overflow-hidden border-rose-100 bg-white/50 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                                <div className="aspect-[3/4] w-full overflow-hidden bg-rose-50 relative">
-                                    <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    />
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-full text-xs font-medium text-rose-700 shadow-sm flex items-center gap-1">
-                                        {product.rating} <Star size={10} fill="currentColor" />
-                                    </div>
-                                </div>
-                                <CardHeader className="pb-2 flex-grow">
-                                    <CardTitle className="text-xl font-serif text-rose-950 group-hover:text-pink-600 transition-colors">
-                                        {product.name}
-                                    </CardTitle>
-                                    <CardDescription className="text-rose-900/60 line-clamp-2 mt-2">
-                                        {product.description}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardFooter className="flex items-center justify-between pt-0 pb-6 mt-auto">
-                                    <span className="text-xl font-semibold text-rose-700">{product.price}</span>
-                                    <Button size="sm" className="bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-900 border border-rose-200">
-                                        Add to Cart
-                                    </Button>
-                                </CardFooter>
-                            </Card>
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </div>
