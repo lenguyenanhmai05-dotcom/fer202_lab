@@ -54,7 +54,7 @@ export default function CartItem({ item }) {
             {/* Subtotal */}
             <div className="text-right min-w-[120px]">
                 <p className="text-xs text-rose-400 font-medium uppercase tracking-wider mb-1">Subtotal</p>
-                <p className="text-lg font-bold text-rose-900">{subtotal}.000 ₫</p>
+                <p className="text-lg font-bold text-rose-900">{subtotal} ₫</p>
             </div>
 
             {/* Remove Button */}

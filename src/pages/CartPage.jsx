@@ -61,7 +61,7 @@ export default function CartPage() {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Subtotal</span>
-                                    <span className="font-medium text-rose-900">{total}.000 ₫</span>
+                                    <span className="font-medium text-rose-900">{total} ₫</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Shipping</span>
@@ -70,7 +70,7 @@ export default function CartPage() {
                                 <div className="border-t border-dashed border-rose-200 my-4" />
                                 <div className="flex justify-between text-lg font-bold text-rose-950">
                                     <span>Total</span>
-                                    <span>{total}.000 ₫</span>
+                                    <span>{total} ₫</span>
                                 </div>
                             </div>
 
