@@ -1,25 +1,19 @@
-import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ShoppingBag, User, LogIn, LogOut, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/context/CartContext"
+import { useAuth } from "@/context/AuthContext"
 
 export default function NavHeader() {
     const { getCartCount } = useCart()
-    // Lazy init to avoid useEffect and satisfy linter
-    const [user, setUser] = useState(() => {
-        if (typeof window !== "undefined") {
-            const stored = localStorage.getItem("currentUser")
-            return stored ? JSON.parse(stored) : null
-        }
-        return null
-    })
+    const { user, signOut } = useAuth()
 
-    const handleLogout = () => {
-        localStorage.removeItem("currentUser")
-        setUser(null)
-        alert("Logged out successfully!")
-        // Optional: Redirect to login or stay. Lab 2 said stay.
+    const handleLogout = async () => {
+        const { error } = await signOut()
+        if (error) {
+            console.error(error)
+            alert("Logout failed!")
+        }
     }
 
     return (
@@ -53,9 +47,7 @@ export default function NavHeader() {
                     {/* AUTH BUTTONS */}
                     {user ? (
                         <>
-                            <span className="hidden md:inline-block text-rose-900 font-medium font-serif">
-                                Welcome, {user.name}
-                            </span>
+                            <span className="hidden md:inline-block text-rose-900 font-medium font-serif">Welcome, {user.user_metadata?.name || user.email}</span>
                             <Button
                                 onClick={handleLogout}
                                 variant="ghost"

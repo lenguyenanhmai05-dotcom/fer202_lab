@@ -3,11 +3,47 @@ import { ArrowLeft, CreditCard } from "lucide-react"
 import NavHeader from "@/components/NavHeader"
 import CartItem from "@/components/CartItem"
 import { useCart } from "@/context/CartContext"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { supabase } from "@/lib/supabase"
 
 export default function CartPage() {
     const { cartItems, getCartTotal, clearCart } = useCart()
+    const { user } = useAuth()
+    const navigate = useNavigate()
+    const [isCheckingOut, setIsCheckingOut] = useState(false)
+
     const total = getCartTotal().toLocaleString('vi-VN')
+
+    const handleCheckout = async () => {
+        if (!user) {
+            alert("Please login to proceed to checkout.")
+            navigate("/login", { state: { from: "/cart" } })
+            return
+        }
+
+        setIsCheckingOut(true)
+
+        const { error } = await supabase.from('orders').insert({
+            user_id: user.id,
+            total_price: getCartTotal(),
+            items: cartItems
+        })
+
+        setIsCheckingOut(false)
+
+        if (error) {
+            console.error("Checkout error:", error)
+            alert("Failed to place order. Please try again.")
+            return
+        }
+
+        alert("Order placed successfully!")
+        clearCart()
+        navigate("/orders")
+    }
 
     return (
         <div className="min-h-screen bg-[#fdf2f8]">
@@ -74,8 +110,12 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            <Button className="w-full rounded-full bg-rose-900 hover:bg-rose-800 h-14 text-lg font-medium shadow-lg hover:shadow-xl transition-all">
-                                Checkout
+                            <Button
+                                onClick={handleCheckout}
+                                disabled={isCheckingOut || cartItems.length === 0}
+                                className="w-full rounded-full bg-rose-900 hover:bg-rose-800 h-14 text-lg font-medium shadow-lg hover:shadow-xl transition-all"
+                            >
+                                {isCheckingOut ? "Processing..." : "Checkout"}
                             </Button>
 
                             <button

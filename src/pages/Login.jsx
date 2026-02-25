@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/context/AuthContext"
 
 const images = [
     "https://i.pinimg.com/1200x/65/e8/1c/65e81c0a1ab979bd8b005b5cb3cebb13.jpg",
@@ -21,6 +22,8 @@ export default function Login() {
         email: "",
         password: "",
     })
+    const { signIn } = useAuth()
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -34,34 +37,20 @@ export default function Login() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
 
-        const existingUsers = JSON.parse(localStorage.getItem("users") || "[]")
+        const { error } = await signIn(formData.email, formData.password)
 
-        // Default user for testing/grading (Works even on fresh Vercel deploy)
-        const defaultUser = {
-            email: "admin@gmail.com",
-            password: "123",
-            name: "Admin"
-        }
+        setIsLoading(false)
 
-        let isValidUser = existingUsers.find(
-            user => user.email === formData.email && user.password === formData.password
-        )
-
-        // Allow login with default user
-        if (!isValidUser && formData.email === defaultUser.email && formData.password === defaultUser.password) {
-            isValidUser = defaultUser
-        }
-
-        if (isValidUser) {
-            alert("Login successful! Redirecting to home...")
-            // Simulating a logged-in state (optional)
-            localStorage.setItem("currentUser", JSON.stringify(isValidUser))
-            navigate("/")
+        if (error) {
+            alert(error.message || "Invalid email or password!")
         } else {
-            alert("Invalid email or password!")
+            alert("Login successful! Redirecting to home...")
+            // The AuthContext will update, NavHeader will re-render
+            navigate("/")
         }
     }
 
@@ -109,8 +98,8 @@ export default function Login() {
                             />
                         </div>
 
-                        <Button type="submit" className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg hover:opacity-90">
-                            Sign In
+                        <Button disabled={isLoading} type="submit" className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg hover:opacity-90">
+                            {isLoading ? "Signing In..." : "Sign In"}
                         </Button>
                     </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/context/AuthContext"
 
 const images = [
     "https://i.pinimg.com/1200x/65/e8/1c/65e81c0a1ab979bd8b005b5cb3cebb13.jpg",
@@ -23,6 +24,8 @@ export default function Register() {
         phone: "",
         password: "",
     })
+    const { signUp } = useAuth()
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -36,20 +39,19 @@ export default function Register() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
 
-        // Check if user already exists
-        const existingUsers = JSON.parse(localStorage.getItem("users") || "[]")
-        if (existingUsers.find(user => user.email === formData.email)) {
-            alert("Email already registered!")
+        // Using Supabase Auth
+        const { error } = await signUp(formData.email, formData.password, formData.name)
+
+        setIsLoading(false)
+
+        if (error) {
+            alert(error.message || "Registration failed!")
             return
         }
-
-        // Save new user
-        const newUser = { ...formData }
-        existingUsers.push(newUser)
-        localStorage.setItem("users", JSON.stringify(existingUsers))
 
         alert("Registration successful! Redirecting to login...")
         navigate("/login")
@@ -107,8 +109,8 @@ export default function Register() {
                             onChange={handleChange}
                         />
 
-                        <Button type="submit" className="h-12 w-full rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg hover:opacity-90">
-                            Continue
+                        <Button disabled={isLoading} type="submit" className="h-12 w-full rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg hover:opacity-90">
+                            {isLoading ? "Signing up..." : "Continue"}
                         </Button>
                     </div>
 
