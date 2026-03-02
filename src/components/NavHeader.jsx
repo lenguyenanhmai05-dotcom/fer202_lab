@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ShoppingBag, User, LogIn, LogOut, ShoppingCart } from "lucide-react"
+import { ShoppingBag, User, LogIn, LogOut, ShoppingCart, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
@@ -47,7 +47,13 @@ export default function NavHeader() {
                     {/* AUTH BUTTONS */}
                     {user ? (
                         <>
-                            <span className="hidden md:inline-block text-rose-900 font-medium font-serif">Welcome, {user.user_metadata?.name || user.email}</span>
+                            <Link to="/orders">
+                                <Button variant="ghost" className="text-rose-900 hover:text-rose-700 hover:bg-rose-50 font-medium">
+                                    <Package className="mr-2 h-4 w-4" />
+                                    <span className="hidden md:inline-block">Orders</span>
+                                </Button>
+                            </Link>
+                            <span className="hidden md:inline-block text-rose-900 font-medium font-serif ml-2">Welcome, {user.user_metadata?.name || user.email}</span>
                             <Button
                                 onClick={handleLogout}
                                 variant="ghost"
