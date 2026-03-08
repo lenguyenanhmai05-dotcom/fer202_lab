@@ -6,6 +6,7 @@ import CartPage from "@/pages/CartPage"
 import { CartProvider } from "@/context/CartContext"
 import { AuthProvider } from "@/context/AuthContext"
 import OrderHistory from "@/pages/OrderHistory"
+import ChatInterface from "@/components/ChatInterface"
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/orders" element={<OrderHistory />} />
           </Routes>
+          <ChatInterface />
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
